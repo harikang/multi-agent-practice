@@ -1,0 +1,19 @@
+# Multi-Agent Research System Requirements
+
+# Core Framework
+strands
+streamlit>=1.24.0
+
+# Local Memory & Embeddings
+faiss-cpu
+sentence-transformers
+numpy
+
+# Optional / Tool Specific
+# ollama          # Required if using local LLM features
+# beautifulsoup4  # Required for some web tools
+# torch           # Required for code implementation agent (PyTorch)
+
+# Transformer Implementation (Legacy)
+# torch>=1.9.0
+# matplotlib>=3.3.0
