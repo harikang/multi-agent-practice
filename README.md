@@ -4,32 +4,56 @@ A sophisticated multi-agent system built with the **Strands** framework, designe
 
 ## 🚀 Overview
 
-This system coordinates four specialized AI agents to handle different aspects of research:
-1.  **Summary Agent**: Digests complex papers into clear summaries, fetching **real architecture figures** from Ar5iv.
-2.  **Code Agent**: Implements paper methodologies in Python (PyTorch/TensorFlow).
-3.  **Idea Agent**: Generates novel follow-up research directions.
-4.  **Figure Generation Agent**: Visualizes architectures conceptually and provides PPT drawing guides.
-5.  **Related Paper Agent**: Searches arXiv and maintains a **local knowledge base**.
+This system coordinates specialized AI agents to handle different aspects of research, from summarization to code implementation and connecting related works.
 
-## 🏗️ Architecture
+## 🏗️ Architecture & Agent Hierarchy
 
-The system uses a Hub-and-Spoke model where a central **Orchestrator** (powered by Claude 3.5 Sonnet on Bedrock) routes user queries to the most appropriate specialized agent.
+The system operates on a **Hub-and-Spoke** architecture. The **Research Orchestrator** acts as the central brain, routing user intents to the appropriate sub-agents.
 
-### 🤖 Agents
+### 🧠 **Research Orchestrator** (`research_orchestrator.py`)
+- **Role**: Central controller. Analyzes user queries and dispatches tasks.
+- **Tools**: Manages the following sub-agents:
 
-| Agent | File | Responsibilities |
-|-------|------|------------------|
-| **Research Orchestrator** | `research_orchestrator.py` | Central brain. Routes tasks to specialized agents based on user intent. |
-| **Summary Paper Agent** | `summary_paper_agent.py` | Summarizes papers. **Features:** Auto-downloads paper figures from Ar5iv and displays them inline. Uses `http_request` for full-text access. |
-| **Code Implementation Agent** | `from_scratch_agent.py` | Writes production-ready Python code to implement algorithms from papers. |
-| **Idea Generation Agent** | `idea_paper.py` | Brainstorms 3-5 novel follow-up research ideas based on a paper. |
-| **Figure Generation Agent** | `figure_generation_agent.py` | Generates conceptual diagrams and provides step-by-step PPT creation guides. |
-| **Related Paper & Memory Agent** | `related_paper_agent.py` | Searches arXiv for related work and stores/retrieves knowledge using a **local Faiss Vector DB**. |
+    ### 1. 📝 **Paper Summary Agent** (`summary_paper_agent.py`)
+    - **Role**: Summarizes papers and extracts architecture figures.
+    - **Tools**:
+        - `file_read`, `file_write`, `editor`: Manage local paper files and summary drafts.
+        - `http_request`: Fetch paper contents or figures from the web (e.g., Ar5iv).
+        - `shell`: Advanced command execution for file handling.
 
-### 🧠 Local Memory & Persistence
+    ### 2. 💻 **Code Implementation Agent** (`from_scratch_agent.py`)
+    - **Role**: Implements paper algorithms in Python.
+    - **Tools**:
+        - `python_repl`: **Executes Python code** to verify implementation logic.
+        - `file_read`, `file_write`, `editor`: writes source code to files.
 
-- **Local Vector Store**: `related_paper_agent` uses `faiss-cpu` to store paper embeddings locally in `local_memory_db/`.
-- **Figure Downloads**: `summary_paper_agent` automatically downloads extracted figures to `downloaded_figures/` for reliable display.
+    ### 3. 💡 **Idea Generation Agent** (`idea_paper.py`)
+    - **Role**: Brainstorms follow-up research ideas.
+    - **Tools**: *Pure LLM* (Relies on internal model knowledge).
+
+    ### 4. 🔍 **Related Paper Agent** (`related_paper_agent.py`)
+    - **Role**: Searches arXiv and maintains a persistent Knowledge Base.
+    - **Tools**:
+        - `shell`: Executes `curl` or CLI commands to query the arXiv API.
+        - `http_request`: Sends HTTP GET requests to API endpoints.
+        - **`local_memory_tool` (CUSTOM 🛠️)**:
+            - **Purpose**: Local RAG (Retrieval-Augmented Generation) system.
+            - **Backend**: Uses **SentenceTransformer** for embeddings and **Faiss** for vector storage.
+            - **Actions**:
+                - `store`: Vectorize and save information.
+                - `retrieve`: Semantic search for relevant paper context.
+
+    ### 5. 🎨 **Figure Generation Agent** (`figure_generation_agent.py`)
+    - **Role**: Visualizes architectures conceptually.
+    - **Tools**:
+        - `generate_image`: DALL-E/ImageGen tool to create visual drafts.
+
+## 🧠 Local Memory System
+
+The `related_paper_agent` features a fully local memory system to ensure privacy and persistence:
+- **Vector Store**: `faiss-cpu`
+- **Location**: `local_memory_db/`
+- **Embeddings**: `all-MiniLM-L6-v2` (via `sentence-transformers`)
 
 ## 💻 Installation
 
@@ -43,42 +67,18 @@ The system uses a Hub-and-Spoke model where a central **Orchestrator** (powered 
     ```bash
     pip install -r requirements.txt
     ```
-    *(Key deps: `strands`, `streamlit`, `faiss-cpu`, `sentence-transformers`, `beautifulsoup4`, `requests`)*
 
 ## 🛠️ Usage
 
-### 1. Web Interface (Recommended)
-
-Run the polished Streamlit Chatbot UI:
-
+### 1. Web Interface (Streamlit)
 ```bash
 streamlit run streamlit_app.py
 ```
 
-- **Features**:
-  - 💬 Interactive chat with multi-agent routing
-  - 🖼️ **Inline Image Preview**: Instantly view extracted figures or generated diagrams
-  - 🧩 Visual badges for active agents
-
 ### 2. CLI Mode
-
-Run the system directly in your terminal:
-
 ```bash
 python research_orchestrator.py
 ```
-
-## 📂 File Structure
-
-- **`streamlit_app.py`**: The web application entry point.
-- **`research_orchestrator.py`**: Main agent definition & prompt.
-- **`teacher_assistant.py`**: Alternative orchestrator entry point (Legacy).
-- **`summary_paper_agent.py`**: Summary & Figure Extraction logic.
-- **`figure_generation_agent.py`**: Image generation logic.
-- **`from_scratch_agent.py`**: Code generation logic.
-- **`related_paper_agent.py`**: ArXiv search & Local Memory logic.
-- **`downloaded_figures/`**: Directory where extracted paper figures are saved.
-- **`local_memory_db/`**: Directory where Faiss index is persisted.
 
 ---
 *Powered by Strands Framework & AWS Bedrock*
