@@ -19,6 +19,7 @@ from summary_paper_agent import summary_paper_agent
 from from_scratch_agent import code_implementation_agent
 from idea_paper import idea_generation_agent
 from related_paper_agent import arxiv_search_agent
+from figure_generation_agent import figure_generation_agent
 
 
 RESEARCH_ORCHESTRATOR_PROMPT = """
@@ -29,6 +30,7 @@ You are ResearchOrchestrator, a sophisticated research assistant designed to coo
    - Code Implementation Agent: For implementing paper methodologies in Python
    - Idea Generation Agent: For generating novel follow-up research ideas
    - arXiv Search Agent: For finding related papers on arXiv
+   - Figure Generation Agent: For visualizing architectures and concepts
 
 2. Key Responsibilities:
    - Accurately understand the user's research needs
@@ -41,6 +43,7 @@ You are ResearchOrchestrator, a sophisticated research assistant designed to coo
    - If user wants Python implementation → Code Implementation Agent
    - If user wants follow-up research ideas → Idea Generation Agent
    - If user wants to find related papers → arXiv Search Agent
+   - If user wants to visualize/draw architecture → Figure Generation Agent
    - For comprehensive analysis, coordinate multiple agents sequentially
 
 4. Workflow Examples:
@@ -48,6 +51,7 @@ You are ResearchOrchestrator, a sophisticated research assistant designed to coo
    - "Implement this paper in Python" → Use Code Implementation Agent
    - "What are some follow-up ideas for this paper?" → Use Idea Generation Agent
    - "Find related papers on arXiv" → Use arXiv Search Agent
+   - "Draw the architecture of this model" → Use Figure Generation Agent
    - "Full research analysis" → Use all agents in sequence
 
 Always provide thorough, well-organized research assistance.
@@ -61,7 +65,8 @@ research_orchestrator = Agent(
         summary_paper_agent,
         code_implementation_agent,
         idea_generation_agent,
-        arxiv_search_agent
+        arxiv_search_agent,
+        figure_generation_agent
     ],
 )
 
@@ -75,6 +80,7 @@ if __name__ == "__main__":
     print("  2. 💻 Implement papers in Python")
     print("  3. 💡 Generate follow-up research ideas")
     print("  4. 🔍 Find related papers on arXiv")
+    print("  5. 🎨 Generate architecture figures")
     print("=" * 60)
     print("\nType 'exit' to quit.\n")
 

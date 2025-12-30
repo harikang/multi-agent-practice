@@ -15,6 +15,7 @@ This multi-agent system helps researchers by:
 """
 
 from strands import Agent
+from strands.models import BedrockModel
 from summary_paper_agent import summary_paper_agent
 from from_scratch_agent import code_implementation_agent
 from idea_paper import idea_generation_agent
@@ -53,9 +54,16 @@ You are ResearchOrchestrator, a sophisticated research assistant designed to coo
 Always provide thorough, well-organized research assistance.
 """
 
+bedrock_model = BedrockModel(
+    model_id="us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+    region_name="us-west-2",
+    temperature=0.9,
+)
+
 # Create the orchestrator agent with all specialized agents as tools
 research_orchestrator = Agent(
     system_prompt=RESEARCH_ORCHESTRATOR_PROMPT,
+    model=bedrock_model,
     callback_handler=None,
     tools=[
         summary_paper_agent,
